@@ -24,12 +24,13 @@ const Board = (props) => {
     const [winner, setWinner] = useState(false);
 
     useEffect(() => {
-        socket.on('message', (iPos, jPos, player) => {
+        socket.on('message', (iPos, jPos, player, winner) => {
             const square = squares.slice();
             square[iPos][jPos] = (player === 'W' ? 'B' : 'W');
             setSquares(square);
             setWhiteTurn(player === 'W');
-            setWinner(calculateWinner(squares, iPos, jPos));
+            // setWinner(calculateWinner(squares, iPos, jPos));
+            setWinner(winner);
         });
         //disabling warning bc I need the dependency array to be empty to avoid an infinite render
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -44,12 +45,14 @@ const Board = (props) => {
             jPos: j,
             currPlayer: whiteTurn ? 'W' : 'B',
             secret: props.secretKey,
+            piece: props.playerPiece,
         });
     };
 
     const renderSquare = (i, j) => {
         return (
             <Square
+                key = {i * 19 + j}
                 value={squares[i][j]}
                 onClick={() => handleClick(i, j)}
             />
@@ -88,7 +91,7 @@ const Board = (props) => {
 };
 
 const Game = () => {
-    let gameBoard = null;
+    let gameBoard;
     const [auth, setAuth] = useState(false);
     const [username, setUser] = useState('');
     const [secretKey, setKey] = useState(0);
@@ -148,122 +151,122 @@ const Game = () => {
 };
 
 
-function calculateWinner(squares, i , j) {
-    const iReset = i;
-    const jReset = j;
-    //left & right
-    let count = 0;
-    let curr = squares[i][j];
-    //left
-    while (j >= 0) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            j--;
-        } else {
-            //no more going left
-            break;
-        }
-    }
-    //right
-    j = jReset + 1;
-    while (j < squares.length) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            j++;
-        } else {
-            break;
-        }
-    }
-
-    //up & down
-    j = jReset;
-    count = 0;
-    //up
-    while (i >= 0) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            i--;
-        } else {
-            //no more going up
-            break;
-        }
-    }
-    //down
-    i = iReset + 1;
-    while (i < squares.length) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            i++;
-        } else {
-            break;
-        }
-    }
-
-    //diagonal1
-    j = jReset;
-    i = iReset;
-    count = 0;
-    //up left
-    while (i >= 0 && j >= 0) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            i--;
-            j--;
-        } else {
-            //no more going left & up
-            break;
-        }
-    }
-    //down right
-    i = iReset + 1;
-    j = jReset + 1;
-    while (i < squares.length && j < squares.length) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            i++;
-            j++;
-        } else {
-            break;
-        }
-    }
-
-    //diagonal2
-    j = jReset;
-    i = iReset;
-    count = 0;
-    //up right
-    while (i >= 0 && j < squares.length) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            i--;
-            j++;
-        } else {
-            //no more going up & right
-            break;
-        }
-    }
-    //down left
-    i = iReset + 1;
-    j = jReset - 1;
-    while (i < squares.length && j >= 0) {
-        if (squares[i][j] === curr) {
-            count++;
-            if (count === 5) return true;
-            i++;
-            j--;
-        } else {
-            break;
-        }
-    }
-    return false;
-}
+// function calculateWinner(squares, i , j) {
+//     const iReset = i;
+//     const jReset = j;
+//     //left & right
+//     let count = 0;
+//     let curr = squares[i][j];
+//     //left
+//     while (j >= 0) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             j--;
+//         } else {
+//             //no more going left
+//             break;
+//         }
+//     }
+//     //right
+//     j = jReset + 1;
+//     while (j < squares.length) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             j++;
+//         } else {
+//             break;
+//         }
+//     }
+//
+//     //up & down
+//     j = jReset;
+//     count = 0;
+//     //up
+//     while (i >= 0) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             i--;
+//         } else {
+//             //no more going up
+//             break;
+//         }
+//     }
+//     //down
+//     i = iReset + 1;
+//     while (i < squares.length) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             i++;
+//         } else {
+//             break;
+//         }
+//     }
+//
+//     //diagonal1
+//     j = jReset;
+//     i = iReset;
+//     count = 0;
+//     //up left
+//     while (i >= 0 && j >= 0) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             i--;
+//             j--;
+//         } else {
+//             //no more going left & up
+//             break;
+//         }
+//     }
+//     //down right
+//     i = iReset + 1;
+//     j = jReset + 1;
+//     while (i < squares.length && j < squares.length) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             i++;
+//             j++;
+//         } else {
+//             break;
+//         }
+//     }
+//
+//     //diagonal2
+//     j = jReset;
+//     i = iReset;
+//     count = 0;
+//     //up right
+//     while (i >= 0 && j < squares.length) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             i--;
+//             j++;
+//         } else {
+//             //no more going up & right
+//             break;
+//         }
+//     }
+//     //down left
+//     i = iReset + 1;
+//     j = jReset - 1;
+//     while (i < squares.length && j >= 0) {
+//         if (squares[i][j] === curr) {
+//             count++;
+//             if (count === 5) return true;
+//             i++;
+//             j--;
+//         } else {
+//             break;
+//         }
+//     }
+//     return false;
+// }
 
 
 ReactDOM.render(

@@ -38,17 +38,27 @@ def new_user():
 def handle_message(message):
     global secret_key
     global winner
-    if (message['secret'] != secret_key):
+    i = message['iPos']
+    j = message['jPos']
+    board = message['boardState']
+    player = message['currPlayer']
+    piece = message['piece']
+
+    if (message['secret'] != secret_key or piece != player or winner):
         return False
-    valid = valid_move(message['iPos'], message['jPos'], message['boardState'])
+
+    valid = valid_move(i, j, board)
     if not valid:
         return False
-    player = message['currPlayer']
+
+    board[i][j] = player
+    winner = calculate_winner(i, j, board)
+
     if (player == 'W') :
         retPlayer = 'B'
     else :
         retPlayer = 'W'
-    send((message['iPos'], message['jPos'], retPlayer), broadcast=True)
+    send((message['iPos'], message['jPos'], retPlayer, winner), broadcast=True)
     return None
 
 def valid_move(iPos, jPos, squares):
@@ -59,115 +69,115 @@ def valid_move(iPos, jPos, squares):
     else:
         return True
 
-# def calculate_winner(i, j, squares):
-#     iReset = i
-#     jReset = j
-#     #left & right
-#     count = 0
-#     curr = squares[i][j]
-#     #left
-#     while (j >= 0) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5) :
-#                 return True
-#             j = j - 1
-#         else :
-#             #no more going left
-#             break
-#
-#     #right
-#     j = jReset + 1
-#     while (j < len(squares)) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5) :
-#                 return True
-#             j = j + 1
-#         else :
-#             break
-#
-#     #up & down
-#     j = jReset
-#     count = 0
-#     #up
-#     while (i >= 0) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5):
-#                 return True
-#             i = i - 1
-#         else :
-#             #no more going up
-#             break
-#     #down
-#     i = iReset + 1
-#     while (i < len(squares)) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5) :
-#                 return True
-#             i = i + 1
-#         else :
-#             break
-#
-#     #diagonal1
-#     j = jReset
-#     i = iReset
-#     count = 0
-#     #up left
-#     while (i >= 0 and j >= 0) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5) :
-#                 return True
-#             i = i - 1
-#             j = j - 1
-#         else :
-#             #no more going left & up
-#             break
-#     #down right
-#     i = iReset + 1
-#     j = jReset + 1
-#     while (i < len(squares) and j < len(squares)) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5) :
-#                 return True
-#             i = i + 1
-#             j = j + 1
-#         else :
-#             break
-#
-#     #diagonal2
-#     j = jReset
-#     i = iReset
-#     count = 0
-#     #up right
-#     while (i >= 0 and j < len(squares)) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5) :
-#                 return True
-#             i = i - 1
-#             j = j - 1
-#         else :
-#             #no more going up & right
-#             break
-#     #down left
-#     i = iReset + 1
-#     j = jReset - 1
-#     while (i < len(squares) and j >= 0) :
-#         if (squares[i][j] == curr) :
-#             count = count + 1
-#             if (count == 5) :
-#                 return True
-#             i = i + 1
-#             j = j + 1
-#         else :
-#             break
-#     return False
-#
+def calculate_winner(i, j, squares):
+    iReset = i
+    jReset = j
+    #left & right
+    count = 0
+    curr = squares[i][j]
+    #left
+    while (j >= 0) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5) :
+                return True
+            j = j - 1
+        else :
+            #no more going left
+            break
+
+    #right
+    j = jReset + 1
+    while (j < len(squares)) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5) :
+                return True
+            j = j + 1
+        else :
+            break
+
+    #up & down
+    j = jReset
+    count = 0
+    #up
+    while (i >= 0) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5):
+                return True
+            i = i - 1
+        else :
+            #no more going up
+            break
+    #down
+    i = iReset + 1
+    while (i < len(squares)) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5) :
+                return True
+            i = i + 1
+        else :
+            break
+
+    #diagonal1
+    j = jReset
+    i = iReset
+    count = 0
+    #up left
+    while (i >= 0 and j >= 0) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5) :
+                return True
+            i = i - 1
+            j = j - 1
+        else :
+            #no more going left & up
+            break
+    #down right
+    i = iReset + 1
+    j = jReset + 1
+    while (i < len(squares) and j < len(squares)) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5) :
+                return True
+            i = i + 1
+            j = j + 1
+        else :
+            break
+
+    #diagonal2
+    j = jReset
+    i = iReset
+    count = 0
+    #up right
+    while (i >= 0 and j < len(squares)) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5) :
+                return True
+            i = i - 1
+            j = j + 1
+        else :
+            #no more going up & right
+            break
+    #down left
+    i = iReset + 1
+    j = jReset - 1
+    while (i < len(squares) and j >= 0) :
+        if (squares[i][j] == curr) :
+            count = count + 1
+            if (count == 5) :
+                return True
+            i = i + 1
+            j = j - 1
+        else :
+            break
+    return False
+
 
 if __name__ == '__main__':
     socketio.run(app)
