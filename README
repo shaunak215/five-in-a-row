@@ -1,0 +1,11 @@
+Stack: Flask + React
+In order to run the flask server
+    -start the virtual enviornment (source env/bin/activate)
+    -Run (python app.py)
+
+In order to start the react front-end navigate to go/client
+    -Run npm-start
+
+Note:
+The server only allows 2 users at once. If someone refreshes they will not be able to re-join the game. Please restart the server and start a new game. The same is the case for restarting the game. 
+
